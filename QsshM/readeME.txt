@@ -1,0 +1,6 @@
+1. Spring 和 Hibernate 整合
+   （1） 由IOC容器来生成Hibernate的sessionFactory  更好的管理
+   （2）让Hibernate使用上spring的生命试事务
+2.整合步骤
+   （1）jar包
+   pom.xml
