@@ -20,8 +20,8 @@
 			<property name="password" value="${jdbc.password}" />
 			<property name="filters" value="mergeStat" />
 			<!-- 密码解密 -->
-			<property name="filters" value="config" />
-			<property name="connectionProperties" value="config.decrypt=true" />
+<!-- 			<property name="filters" value="config" /> -->
+<!-- 			<property name="connectionProperties" value="config.decrypt=true" /> -->
 			<!-- 申请连接的时候检测 -->
 			<property name="testWhileIdle" value="true"></property> 
 			<!-- 检测连接 -->
