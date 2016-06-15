@@ -251,6 +251,11 @@
 			<version>${logback.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>1.4.2.RELEASE</version>
+		</dependency>
 		<!-- 代码直接调用log4j会被桥接到slf4j -->
 		<!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>log4j-over-slf4j</artifactId> 
 			<version>${slf4j.version}</version> <scope>runtime</scope> </dependency> -->
@@ -285,6 +290,21 @@
 			<version>${jackson.version}</version>
 		</dependency>
 		<!-- JSON end -->
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+			<version>2.4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+			<version>4.2.4.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>4.2.4.Final</version>
+		</dependency>
 		<!-- 解析客户端操作系统、浏览器等 -->
 		<dependency>
 			<groupId>bitwalker</groupId>

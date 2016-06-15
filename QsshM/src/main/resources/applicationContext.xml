@@ -1,78 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
+	<!-- 配置自动扫描的包 -->
+	<context:component-scan base-package="com.qsshm">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
 	<!-- 配置数据源 -->
-	<context:property-placeholder location="classpath:db.properties"/>
+	<context:property-placeholder location="classpath:db.properties" />
 
 	<!-- 数据源配置, 使用druid连接池 -->
-		<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
-			<property name="driverClassName" value="${jdbc.driver}" />
-			<property name="url" value="${jdbc.url}" />
-			<property name="username" value="${jdbc.username}" />
-			<property name="password" value="${jdbc.password}" />
-			<property name="filters" value="mergeStat" />
-			<!-- 密码解密 -->
-<!-- 			<property name="filters" value="config" /> -->
-<!-- 			<property name="connectionProperties" value="config.decrypt=true" /> -->
-			<!-- 申请连接的时候检测 -->
-			<property name="testWhileIdle" value="true"></property> 
-			<!-- 检测连接 -->
-			<property name="validationQuery" value="select 'x'"></property>
-			<!--maxActive: 最大连接数量 -->
-			<property name="maxActive" value="${jdbc.pool.maxActive}" />
-			<!--initialSize: 初始化连接 -->
-			<property name="initialSize" value="${jdbc.pool.maxIdle}" />
-		</bean>
-	<!-- 配置Hibernate的 SessonFactory 实例 -->
-	<!-- 通过Spring 提供的LocalSessionFactoryBean 进行配置 -->
-	<!-- 配置 Hibernate 的 SessionFactory 实例: 通过 Spring 提供的 LocalSessionFactoryBean 进行配置 -->
-	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-		<!-- 配置数据源属性 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="filters" value="mergeStat" />
+		<!-- 密码解密 -->
+		<!-- <property name="filters" value="config" /> -->
+		<!-- <property name="connectionProperties" value="config.decrypt=true" 
+			/> -->
+		<!-- 申请连接的时候检测 -->
+		<property name="testWhileIdle" value="true"></property>
+		<!-- 检测连接 -->
+		<property name="validationQuery" value="select 'x'"></property>
+		<!--maxActive: 最大连接数量 -->
+		<property name="maxActive" value="${jdbc.pool.maxActive}" />
+		<!--initialSize: 初始化连接 -->
+		<property name="initialSize" value="${jdbc.pool.maxIdle}" />
+	</bean>
+	<!-- 配置 JPA 的 EntityManagerFactory -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource"></property>
-		<!-- 配置 hibernate 配置文件的位置及名称 -->
-		<!--  
-		<property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
-		-->
-		<!-- 使用 hibernateProperties 属相来配置 Hibernate 原生的属性 -->
-		<property name="hibernateProperties">
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"></bean>
+		</property>
+		<property name="packagesToScan" value="com.qsshm"></property>
+		<property name="jpaProperties">
 			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory
+				</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
 			</props>
 		</property>
-		<!-- 配置 hibernate 映射文件的位置及名称, 可以使用通配符 -->
-<!-- 		<property name="mappingLocations"  -->
-<!-- 			value="classpath:com/atguigu/spring/hibernate/entities/*.hbm.xml"></property> -->
+		<!-- jpa使用二级缓存 -->
+		<property name="sharedCacheMode" value="ENABLE_SELECTIVE"></property>
 	</bean>
+	<!-- 配置事务 -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory"></property>
+	</bean>
+	<!-- 配置支持基于注解的事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- 配置 SpringData -->
+	<jpa:repositories base-package="com.qsshm"
+		entity-manager-factory-ref="entityManagerFactory"></jpa:repositories>
+
 
 	<!-- 配置 Spring 的声明式事务 -->
 	<!-- 1. 配置事务管理器 -->
-	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-		<property name="sessionFactory" ref="sessionFactory"></property>
-	</bean>
+	<!-- <bean id="transactionManager" -->
+	<!-- class="org.springframework.orm.hibernate4.HibernateTransactionManager"> -->
+	<!-- <property name="sessionFactory" ref="sessionFactory"></property> -->
+	<!-- </bean> -->
 	<!-- 2. 配置事务属性, 需要事务管理器 -->
-	<tx:advice id="txAdvice" transaction-manager="transactionManager">
-		<tx:attributes>
-			<tx:method name="get*" read-only="true"/>
-			<tx:method name="purchase" propagation="REQUIRES_NEW"/>
-			<tx:method name="*"/>
-		</tx:attributes>
-	</tx:advice>
+	<!-- <tx:advice id="txAdvice" transaction-manager="transactionManager"> -->
+	<!-- <tx:attributes> -->
+	<!-- <tx:method name="get*" read-only="true" /> -->
+	<!-- <tx:method name="purchase" propagation="REQUIRES_NEW" /> -->
+	<!-- <tx:method name="*" /> -->
+	<!-- </tx:attributes> -->
+	<!-- </tx:advice> -->
 
-	<!-- 3. 配置事务切点, 并把切点和事务属性关联起来 -->
-<!-- 	<aop:config> -->
-<!-- 		<aop:pointcut expression="execution(execution(* *..service..*(..)))"  -->
-<!-- 			id="txPointcut"/> -->
-<!-- 		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/> -->
-<!-- 	</aop:config> -->
+
 </beans>
